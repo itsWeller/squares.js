@@ -1,8 +1,8 @@
 # cumulo.js
 A customizable, developer-oriented tagcloud solution.
------------
+
 ## Installation
-Install as you would any other jQuery plugin. Bower support is coming soon.tm.
+Install as you would any other jQuery plugin. Bower support is coming soon™.
 
 ## Use
 ```javascript
@@ -13,26 +13,25 @@ $('#tagcloud a').cumulo();
 $('#tagcloud a').cumulo({min:50, attr:'data', sort:'asc'}); 
 ```
 
-
 ## Options and Defaults
 * min: 20
-..* Minumum font size.
+  * Minumum font size.
 * max: 80
-..* Maximum font size.
+  * Maximum font size.
 * attr: 'weight'
-..* Attribute source to gather tag weighting from.
+  * Attribute source to gather tag weighting from.
 * size: linear_map
-..* Function to scale link size from smallest to largest; defaults to a linear mapping.
+  * Function to scale link size from smallest to largest; defaults to a linear mapping.
 * sort: unchanged
-..* Function to order elements; defaults to unchanged. 'asc' and 'desc' are included.
+  * Function to order elements; defaults to unchanged. 'asc' and 'desc' are included.
 * position: position
-..* Function to position elements on page; unimplemented. Looking into masonry-style layout.
+  * Function to position elements on page; unimplemented. Looking into masonry-style layout.
 * mouse_in: maximize,
-..* Function to determine action to take on mouse hover. Defaults to maximizing size.
+  * Function to determine action to take on mouse hover. Defaults to maximizing size.
 * mouse_out: size reset
-..* Function to determine action to take on mouse exit. Defaults to reseting size.
+  * Function to determine action to take on mouse exit. Defaults to reseting size.
 * unit: 'px'
-..* Size to scale elements by.
+  * Size to scale elements by.
 
 
 
