@@ -2,22 +2,23 @@
 
     var weights;
     var options_global;
-    var width_remaining = 100;
-    var height_remaining = 100;
-    var remaining_total;
+    var width_remaining;
+    var height_remaining;
 
     $.fn.cumulo = function (options) {
+
+        height_remaining = width_remaining = 100;
 
         options_global = options = $.extend({}, $.fn.cumulo.defaults, options);
         weights = this.map(function(){ return $(this).attr(options.attr); }).get().sort();
        
         weights.total = 0;
         this.map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
-        remaining_total = weights.total
+
+        shuffleArray(options_global.colors);
 
         return this
-            .sort(sort_delegate).appendTo(this.parent())
-            //.hover(options.mouse_in, options.mouse_out)
+            .sort(descending).appendTo(this.parent())
             .each(function(index) { 
 
                 var ratio = parseFloat($(this).attr(options_global.attr) 
@@ -28,14 +29,15 @@
                 $(this)
                     .css("font-size", 
                         options.size($(this).attr(options.attr)) + options.unit)
-                    .css("border", "4px solid rgba(255,0,255,1)")
+                    //.css("border", "4px solid rgba(255,0,255,1)")
+                    .css("background-color", options_global.colors[index % options_global.colors.length])
+                    .css("color","white")
                     .css("display","inline-block")
                     .css("float", "left")
                     .css("text-align", "center")
                 ;
 
                 if (! (index % 2) ) {                        // Should slice horizontal
-
                     $(this)
                         .css("width",  width_remaining + "%")
                         .css("height", height_remaining * ratio + "%");
@@ -46,8 +48,11 @@
                     $(this)
                         .css("height",  height_remaining + "%")
                         .css("width",   width_remaining * ratio + "%");
+
                     width_remaining  = width_remaining - (width_remaining * ratio) || 100; 
                 }
+
+                $(this).css("line-height",$(this).height()+"px");
             })
         ;
     };
@@ -57,20 +62,16 @@
         max: 80,
         attr: 'weight',
         size: linear_map,
-        sort: descending,
-        position: position,
-        mouse_in: maximize,
-        mouse_out: size_reset,
-        unit: "px"
-    };
-
-    function maximize(element){
-        $(this).css("font-size", options_global.max * 1 + options_global.unit);
-    };
-
-    function size_reset(element){
-        $(this).css("font-size", options_global.size($(this).attr(options_global.attr)) 
-            + options_global.unit);
+        unit: "px",
+        colors: [
+            "#AF0823",
+            "#125FAD",
+            "#613B1E",
+            "#7BBD30",
+            "#CD004A",
+            "#1A207C",
+            "#E9401F"
+        ]
     };
 
     function linear_map(weight){
@@ -78,62 +79,24 @@
             / (weights[weights.length - 1] - weights[0]) + options_global.min;
     };
 
-    function ascending(a,b){
-        return $(a).attr(options_global.attr) - $(b).attr(options_global.attr);
-    };
-
     function descending(a,b){
         return $(b).attr(options_global.attr) - $(a).attr(options_global.attr);
     };
 
-    function random(a,b){
-        //todo
-    };
-
-    /* 
-     * Fisher Yates Shuffle co-opted from the javascript guru himself, Mike Bostock 
-     * http://bost.ocks.org/
+    /** 
+     * TAKEN FROM http://stackoverflow.com/a/12646864 
+     *
+     * Randomize array element order in-place.
+     * Using Fisher-Yates shuffle algorithm.
      */
-    function shuffle(array) {
-        
-        var m = array.length, t, i;
-
-        // While there remain elements to shuffle…
-        while (m) {
-
-            // Pick a remaining element…
-            i = Math.floor(Math.random() * m--);
-            
-            // And swap it with the current element.
-            t = array[m];
-            array[m] = array[i];
-            array[i] = t;
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
         }
-        
         return array;
-    };
-
-    function unchanged(){};
-
-    function sort_delegate(a,b){
-        switch(options_global.sort) {
-            case 'asc':
-                return ascending(a,b);
-                break;
-            case 'desc':
-                return descending(a,b);
-                break;
-            case 'unchanged':
-                return;
-                break;
-            case 'shuffle':
-                return shuffle();
-                break;
-            default:
-                return options_global.sort(a,b);
-        }
-    };
-
-    function position(){console.log("position() called");};
+    }
 
 }(jQuery));
