@@ -2,17 +2,54 @@
 
     var weights;
     var options_global;
+    var width_remaining = 100;
+    var height_remaining = 100;
+    var remaining_total;
 
     $.fn.cumulo = function (options) {
 
         options_global = options = $.extend({}, $.fn.cumulo.defaults, options);
         weights = this.map(function(){ return $(this).attr(options.attr); }).get().sort();
+       
+        weights.total = 0;
+        this.map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
+        remaining_total = weights.total
 
-        return this.each(function () {
-            $(this).css("font-size", options.size($(this).attr(options.attr)) + options.unit);})
-        .sort(sort_delegate).appendTo(this.parent())
-        .hover(options.mouse_in, options.mouse_out);
-        
+        return this
+            .sort(sort_delegate).appendTo(this.parent())
+            //.hover(options.mouse_in, options.mouse_out)
+            .each(function(index) { 
+
+                var ratio = parseFloat($(this).attr(options_global.attr) 
+                    / weights.total).toFixed(2);
+
+                weights.total -= $(this).attr(options_global.attr);
+
+                $(this)
+                    .css("font-size", 
+                        options.size($(this).attr(options.attr)) + options.unit)
+                    .css("border", "4px solid rgba(255,0,255,1)")
+                    .css("display","inline-block")
+                    .css("float", "left")
+                    .css("text-align", "center")
+                ;
+
+                if (! (index % 2) ) {                        // Should slice horizontal
+
+                    $(this)
+                        .css("width",  width_remaining + "%")
+                        .css("height", height_remaining * ratio + "%");
+
+                    height_remaining = height_remaining - (height_remaining * ratio) || 100; 
+
+                } else {                                // Should slice vertical
+                    $(this)
+                        .css("height",  height_remaining + "%")
+                        .css("width",   width_remaining * ratio + "%");
+                    width_remaining  = width_remaining - (width_remaining * ratio) || 100; 
+                }
+            })
+        ;
     };
 
     $.fn.cumulo.defaults = {
@@ -20,7 +57,7 @@
         max: 80,
         attr: 'weight',
         size: linear_map,
-        sort: unchanged,
+        sort: descending,
         position: position,
         mouse_in: maximize,
         mouse_out: size_reset,
