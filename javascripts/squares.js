@@ -16,6 +16,7 @@
         this.map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
 
         shuffleArray(options_global.colors);
+        $(this).parent().css("height", parseInt($(this).parent().parent().css("width"))/options_global.ratio + "px");
 
         return this
             .sort(descending).appendTo(this.parent())
@@ -29,7 +30,6 @@
                 $(this)
                     .css("font-size", 
                         options.size($(this).attr(options.attr)) + options.unit)
-                    //.css("border", "4px solid rgba(255,0,255,1)")
                     .css("background-color", options_global.colors[index % options_global.colors.length])
                     .css("color","white")
                     .css("display","inline-block")
@@ -58,6 +58,7 @@
     };
 
     $.fn.squares.defaults = {
+        ratio: 4/3,
         min: 18,
         max: 80,
         attr: 'weight',
