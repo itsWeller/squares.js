@@ -1,20 +1,20 @@
-# cumulo.js
-A customizable, developer-oriented tagcloud solution.
+# squares.js
+A bisecting, treemap-like visualization of tags, all wrapped up in a nice jQuery plugin.
 
 ## Installation
 Install as you would any other jQuery plugin. Bower support is coming soon™.
 
 ## Use
 ```javascript
-// This creates a tagcloud for all links in the #tagcloud selector, using sensible defaults.
-$('#tagcloud a').cumulo(); 
+// This creates a squares widget for all links in the #squares selector, using sensible defaults.
+$('#squares a').squares(); 
 
-// This creates a tagcloud for all links in the #tagcloud selector, with some passed parameters.
-$('#tagcloud a').cumulo({min:50, attr:'data', sort:'asc'}); 
+// This creates a squares widget for all links in the #tagcloud selector, with some passed parameters.
+$('#squares a').squares({colors: ["#778899","LightBlue","rgba(81,81,81,1)"]});
 ```
 
 ## Options and Defaults
-* min: 20
+* min: 18
   * Minumum font size.
 * max: 80
   * Maximum font size.
@@ -22,16 +22,10 @@ $('#tagcloud a').cumulo({min:50, attr:'data', sort:'asc'});
   * Attribute source to gather tag weighting from.
 * size: linear_map
   * Function to scale link size from smallest to largest; defaults to a linear mapping.
-* sort: unchanged
-  * Function to order elements; defaults to unchanged. 'asc' and 'desc' are included.
-* position: position
-  * Function to position elements on page; unimplemented. Looking into masonry-style layout.
-* mouse_in: maximize,
-  * Function to determine action to take on mouse hover. Defaults to maximizing size.
-* mouse_out: size reset
-  * Function to determine action to take on mouse exit. Defaults to reseting size.
 * unit: 'px'
   * Size to scale elements by.
+* colors: [ "#AF0823", "#125FAD", "#613B1E", "#7BBD30", "#CD004A", "#1A207C","#E9401F" ]
+  * Array of colors to select backgrounds from.
 
 
 

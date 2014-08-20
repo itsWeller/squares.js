@@ -5,11 +5,11 @@
     var width_remaining;
     var height_remaining;
 
-    $.fn.cumulo = function (options) {
+    $.fn.squares = function (options) {
 
         height_remaining = width_remaining = 100;
 
-        options_global = options = $.extend({}, $.fn.cumulo.defaults, options);
+        options_global = options = $.extend({}, $.fn.squares.defaults, options);
         weights = this.map(function(){ return $(this).attr(options.attr); }).get().sort();
        
         weights.total = 0;
@@ -57,8 +57,8 @@
         ;
     };
 
-    $.fn.cumulo.defaults = {
-        min: 20,
+    $.fn.squares.defaults = {
+        min: 18,
         max: 80,
         attr: 'weight',
         size: linear_map,
