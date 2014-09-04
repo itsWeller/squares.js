@@ -6,55 +6,59 @@
     var height_remaining;
 
     $.fn.squares = function (options) {
+        this.each(function(index, element){
 
-        height_remaining = width_remaining = 100;
+            height_remaining = width_remaining = 100;
 
-        options_global = options = $.extend({}, $.fn.squares.defaults, options);
-        weights = this.map(function(){ return $(this).attr(options.attr); }).get().sort();
+            options_global = options = $.extend({}, $.fn.squares.defaults, options);
+            weights = $(this).find('a').map(function(){ return parseInt($(this).attr(options.attr)); }).get().sort(ascending);
        
-        weights.total = 0;
-        this.map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
+            weights.total = 0;
+            $(this).find('a').map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
 
-        shuffleArray(options_global.colors);
-        $(this).parent().css("height", parseInt($(this).parent().parent().css("width"))/options_global.ratio + "px");
+            shuffleArray(options_global.colors);
+            $(this).css("height", parseInt($(this).parent().parent().css("width"))/options_global.ratio + "px");
 
-        return this
-            .sort(descending).appendTo(this.parent())
-            .each(function(index) { 
+            $(this).find('a')
+                .sort(descending).appendTo(this)
+                .each(function(index) { 
 
-                var ratio = parseFloat($(this).attr(options_global.attr) 
-                    / weights.total).toFixed(2);
+                    var ratio = parseFloat($(this).attr(options_global.attr) 
+                        / weights.total).toFixed(2);
 
-                weights.total -= $(this).attr(options_global.attr);
+                    weights.total -= $(this).attr(options_global.attr);
 
-                $(this)
-                    .css("font-size", 
-                        options.size($(this).attr(options.attr)) + options.unit)
-                    .css("background-color", options_global.colors[index % options_global.colors.length])
-                    .css("color","white")
-                    .css("display","inline-block")
-                    .css("float", "left")
-                    .css("text-align", "center")
-                ;
-
-                if (! (index % 2) ) {                        // Should slice horizontal
                     $(this)
-                        .css("width",  width_remaining + "%")
-                        .css("height", height_remaining * ratio + "%");
+                        .css("font-size", 
+                            options.size($(this).attr(options.attr)) + options.unit)
+                        .css("background-color", options_global.colors[index % options_global.colors.length])
+                        .css("color","white")
+                        .css("display","inline-block")
+                        .css("float", "left")
+                        .css("text-align", "center")
+                    ;
 
-                    height_remaining = height_remaining - (height_remaining * ratio) || 100; 
+                    if (! (index % 2) ) {                        // Should slice horizontal
+                        $(this)
+                            .css("width",  width_remaining + "%")
+                            .css("height", height_remaining * ratio + "%");
 
-                } else {                                // Should slice vertical
-                    $(this)
-                        .css("height",  height_remaining + "%")
-                        .css("width",   width_remaining * ratio + "%");
+                        height_remaining = height_remaining - (height_remaining * ratio) || 100; 
 
-                    width_remaining  = width_remaining - (width_remaining * ratio) || 100; 
-                }
+                    } else {                                // Should slice vertical
+                        $(this)
+                            .css("height",  height_remaining + "%")
+                            .css("width",   width_remaining * ratio + "%");
 
-                $(this).css("line-height",$(this).height()+"px");
-            })
-        ;
+                        width_remaining  = width_remaining - (width_remaining * ratio) || 100; 
+                    }
+
+                    $(this).css("line-height",$(this).height()+"px");
+                })
+            ; 
+        });
+
+        return this;
     };
 
     $.fn.squares.defaults = {
@@ -81,7 +85,11 @@
     };
 
     function descending(a,b){
-        return $(b).attr(options_global.attr) - $(a).attr(options_global.attr);
+        return b - a;
+    };
+
+    function ascending(a,b){
+        return a - b;
     };
 
     /** 
