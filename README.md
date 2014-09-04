@@ -7,10 +7,10 @@ Install as you would any other jQuery plugin. Bower support is coming soon™.
 ## Use
 ```javascript
 // This creates a squares widget for all links in the #squares selector, using sensible defaults.
-$('#squares a').squares(); 
+$('#squares').squares(); 
 
 // This creates a squares widget for all links in the #squares selector, with some passed parameters.
-$('#squares a').squares({
+$('#squares').squares({
     colors: ["#778899","LightBlue","rgba(81,81,81,1)"],
     min: 25,
     max: 40,
