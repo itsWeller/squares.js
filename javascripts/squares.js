@@ -17,7 +17,7 @@
             $(this).find('a').map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
 
             shuffleArray(options_global.colors);
-            $(this).css("height", parseInt($(this).parent().parent().css("width"))/options_global.ratio + "px");
+            $(this).css("height", parseInt($(this).parent().css("width"))/options_global.ratio + "px");
 
             var sorted_elems = $(this).find('a').sort(weight_descending);
 
