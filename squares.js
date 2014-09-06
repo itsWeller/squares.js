@@ -19,43 +19,45 @@
             shuffleArray(options_global.colors);
             $(this).css("height", parseInt($(this).parent().parent().css("width"))/options_global.ratio + "px");
 
-            $(this).find('a')
-                .sort(descending).appendTo(this)
-                .each(function(index) { 
+            var sorted_elems = $(this).find('a').sort(weight_descending);
 
-                    var ratio = parseFloat($(this).attr(options_global.attr) 
-                        / weights.total).toFixed(2);
+            $(this).find('a').remove();
+            $(this).append(sorted_elems);
 
-                    weights.total -= $(this).attr(options_global.attr);
+            $(this).find('a').each(function(index) { 
 
+                var ratio = parseFloat($(this).attr(options_global.attr) 
+                    / weights.total).toFixed(2);
+
+                weights.total -= $(this).attr(options_global.attr);
+
+                $(this)
+                    .css("font-size", 
+                        options.size($(this).attr(options.attr)) + options.unit)
+                    .css("background-color", options_global.colors[index % options_global.colors.length])
+                    .css("color","white")
+                    .css("display","inline-block")
+                    .css("float", "left")
+                    .css("text-align", "center")
+                ;
+
+                if (! (index % 2) ) {                        // Should slice horizontal
                     $(this)
-                        .css("font-size", 
-                            options.size($(this).attr(options.attr)) + options.unit)
-                        .css("background-color", options_global.colors[index % options_global.colors.length])
-                        .css("color","white")
-                        .css("display","inline-block")
-                        .css("float", "left")
-                        .css("text-align", "center")
-                    ;
+                        .css("width",  width_remaining + "%")
+                        .css("height", height_remaining * ratio + "%");
 
-                    if (! (index % 2) ) {                        // Should slice horizontal
-                        $(this)
-                            .css("width",  width_remaining + "%")
-                            .css("height", height_remaining * ratio + "%");
+                    height_remaining = height_remaining - (height_remaining * ratio) || 100; 
 
-                        height_remaining = height_remaining - (height_remaining * ratio) || 100; 
+                } else {                                // Should slice vertical
+                    $(this)
+                        .css("height",  height_remaining + "%")
+                        .css("width",   width_remaining * ratio + "%");
 
-                    } else {                                // Should slice vertical
-                        $(this)
-                            .css("height",  height_remaining + "%")
-                            .css("width",   width_remaining * ratio + "%");
+                    width_remaining  = width_remaining - (width_remaining * ratio) || 100; 
+                }
 
-                        width_remaining  = width_remaining - (width_remaining * ratio) || 100; 
-                    }
-
-                    $(this).css("line-height",$(this).height()+"px");
-                })
-            ; 
+                $(this).css("line-height",$(this).height()+"px");
+            });
         });
 
         return this;
@@ -84,7 +86,11 @@
             / (weights[weights.length - 1] - weights[0]) + options_global.min;
     };
 
-    function descending(a,b){
+    function weight_descending(a,b){
+        return $(b).attr(options_global.attr) - $(a).attr(options_global.attr);
+    };
+
+   function descending(a,b){
         return b - a;
     };
 
