@@ -6,21 +6,25 @@
     var height_remaining;
 
     $.fn.squares = function (options) {
+        this.each(function(index, element){
 
-        height_remaining = width_remaining = 100;
+            height_remaining = width_remaining = 100;
 
-        options_global = options = $.extend({}, $.fn.squares.defaults, options);
-        weights = this.map(function(){ return $(this).attr(options.attr); }).get().sort();
+            options_global = options = $.extend({}, $.fn.squares.defaults, options);
+            weights = $(this).find('a').map(function(){ return parseInt($(this).attr(options.attr)); }).get().sort(ascending);
        
-        weights.total = 0;
-        this.map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
+            weights.total = 0;
+            $(this).find('a').map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
 
-        shuffleArray(options_global.colors);
-        $(this).parent().css("height", parseInt($(this).parent().parent().css("width"))/options_global.ratio + "px");
+            shuffleArray(options_global.colors);
+            $(this).css("height", parseInt($(this).parent().parent().css("width"))/options_global.ratio + "px");
 
-        return this
-            .sort(descending).appendTo(this.parent())
-            .each(function(index) { 
+            var sorted_elems = $(this).find('a').sort(weight_descending);
+
+            $(this).find('a').remove();
+            $(this).append(sorted_elems);
+
+            $(this).find('a').each(function(index) { 
 
                 var ratio = parseFloat($(this).attr(options_global.attr) 
                     / weights.total).toFixed(2);
@@ -53,8 +57,10 @@
                 }
 
                 $(this).css("line-height",$(this).height()+"px");
-            })
-        ;
+            });
+        });
+
+        return this;
     };
 
     $.fn.squares.defaults = {
@@ -80,8 +86,16 @@
             / (weights[weights.length - 1] - weights[0]) + options_global.min;
     };
 
-    function descending(a,b){
+    function weight_descending(a,b){
         return $(b).attr(options_global.attr) - $(a).attr(options_global.attr);
+    };
+
+   function descending(a,b){
+        return b - a;
+    };
+
+    function ascending(a,b){
+        return a - b;
     };
 
     /** 
