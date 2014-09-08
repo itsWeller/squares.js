@@ -4,36 +4,105 @@
     var options_global;
     var width_remaining;
     var height_remaining;
+    //var current_visible_page = 0;
 
     $.fn.squares = function (options) {
         this.each(function(index, element){
-
-            height_remaining = width_remaining = 100;
-
+            $(element).css('overflow','hidden');
+            $(element).data('current-page',0);
+            $(element).css('height','200px');
+           
+            // Custodial business.
             options_global = options = $.extend({}, $.fn.squares.defaults, options);
-            weights = $(this).find('a').map(function(){ return parseInt($(this).attr(options.attr)); }).get().sort(ascending);
-       
-            weights.total = 0;
-            $(this).find('a').map(function(){ weights.total += parseInt($(this).attr(options.attr)) || 0; });
-
             shuffleArray(options_global.colors);
+
+            // Calculating percentage left of div; should be better way?
+            height_remaining = width_remaining = 100;   
+
+            // Set height of primary square container to be some ratio of the parent's width and supplied dimension.
             $(this).css("height", parseInt($(this).parent().css("width"))/options_global.ratio + "px");
 
+            // Rearrange elements in div.
             var sorted_elems = $(this).find('a').sort(weight_descending);
-
             $(this).find('a').remove();
             $(this).append(sorted_elems);
 
-            $(this).find('a').each(function(index) { 
+            // If pagination's desired...
+            if (options_global.more_link) {
+                var more_index = options_global.page_limit - 2;
+                var shift_count = 0;
+            
+                // Begin insertion of 'More...' elements.
+                while (more_index + shift_count < $(element).find('a').length - 1) {
+                
+                    var insertion_index = more_index + shift_count;
 
+                    // Build 'More' element.
+                    $('<a weight=' + parseInt($($(element).find('a')[insertion_index]).attr(options_global.attr)) + 
+                            '>More..</a>').insertAfter($($(element).find('a')[insertion_index]));
+
+/*                  Animation is still a WIP.
+ *
+ *                  ).click(function(){
+ *                      //$(element).find('.page-'+current_visible_page++).slideUp();
+ *                      $(element).find('.page-'+$(element).data('current-page')).slideUp();
+ *                      $(element).data()['current-page']++;
+ *                  });
+ */
+                    more_index += options_global.page_limit - 1;
+                    shift_count++;
+                }
+            }
+
+            // Find weights and critical points of elements in div. 
+            weights = $(this).find('a').map(function(index){ 
+                return parseInt($(this).attr(options.attr)); 
+            }).get(); 
+
+            // Weight calculations.
+            var page_index = 0;
+            weights.total = 0;
+            weights.total_for_page = [0];
+
+            // Determine weight totals per-page.
+            $(weights).each(function(index){
+                var current_weight = parseInt(this);
+
+                // Time to move on to next page.
+                while (index >= options_global.page_limit * (page_index + 1)) { 
+                    weights.total_for_page.push(0);
+                    ++page_index; 
+                }
+
+                // Update totals.
+                weights.total_for_page[page_index] += current_weight;
+                weights.total += current_weight;
+            });
+
+            // Arrange weights for font size sorting.
+            weights = weights.sort(ascending);
+            page_index = 0;
+
+            // Begin sub-square calculations.
+            $(this).find('a').each(function(index, element) { 
+
+                // Once again, time to jump pages.
+                while (index >= options_global.page_limit * (page_index + 1)) { 
+                    height_remaining = width_remaining = 100;   
+                    ++page_index; 
+                }
+
+                // Determine size of sub-square in relation to rest. Percision errors here.
                 var ratio = parseFloat($(this).attr(options_global.attr) 
-                    / weights.total).toFixed(2);
+                    / weights.total_for_page[page_index]).toFixed(2);
 
                 weights.total -= $(this).attr(options_global.attr);
+                weights.total_for_page[page_index] -= $(this).attr(options_global.attr);
 
                 $(this)
+                    // If on other page, make hidden?
                     .css("font-size", 
-                        options.size($(this).attr(options.attr)) + options.unit)
+                        options.size($(this).attr(options.attr)) + options.unit)    // Call sizing function with specified attr and append unit.
                     .css("background-color", options_global.colors[index % options_global.colors.length])
                     .css("color","white")
                     .css("display","inline-block")
@@ -41,25 +110,34 @@
                     .css("text-align", "center")
                 ;
 
-                if (! (index % 2) ) {                        // Should slice horizontal
+                if (options_global.more_link){
+                   // $(element).data('page', page_index);
+                   // $(element).addClass('page-'+page_index);
+                }
+
+                // Slice should be horizontal.
+                if (! (index % 2) ) {        
                     $(this)
                         .css("width",  width_remaining + "%")
                         .css("height", height_remaining * ratio + "%");
 
                     height_remaining = height_remaining - (height_remaining * ratio) || 100; 
 
-                } else {                                // Should slice vertical
+                // Slice should be vertical.
+                } else {                    
                     $(this)
                         .css("height",  height_remaining + "%")
                         .css("width",   width_remaining * ratio + "%");
 
                     width_remaining  = width_remaining - (width_remaining * ratio) || 100; 
                 }
-
-                $(this).css("line-height",$(this).height()+"px");
+                
+                // Center text vertically in sub-square.
+                $(this).css("line-height", $(this).height()+"px");  
             });
         });
 
+        // Return called elements, because jQuery's made for chaining.
         return this;
     };
 
@@ -70,6 +148,8 @@
         attr: 'weight',
         size: linear_map,
         unit: "px",
+        page_limit: 5,
+        more_link: false,
         colors: [
             "#AF0823",
             "#125FAD",
