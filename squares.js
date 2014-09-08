@@ -4,9 +4,13 @@
     var options_global;
     var width_remaining;
     var height_remaining;
+    //var current_visible_page = 0;
 
     $.fn.squares = function (options) {
         this.each(function(index, element){
+            $(element).css('overflow','hidden');
+            $(element).data('current-page',0);
+            $(element).css('height','200px');
            
             // Custodial business.
             options_global = options = $.extend({}, $.fn.squares.defaults, options);
@@ -23,10 +27,38 @@
             $(this).find('a').remove();
             $(this).append(sorted_elems);
 
-            // Find weights of elements in div. 
-            weights = $(this).find('a').map(function(){ return parseInt($(this).attr(options.attr)); }).get(); 
-            console.log(weights);
+            // If pagination's desired...
+            if (options_global.more_link) {
+                var more_index = options_global.page_limit - 2;
+                var shift_count = 0;
             
+                // Begin insertion of 'More...' elements.
+                while (more_index + shift_count < $(element).find('a').length - 1) {
+                
+                    var insertion_index = more_index + shift_count;
+
+                    // Build 'More' element.
+                    $('<a weight=' + parseInt($($(element).find('a')[insertion_index]).attr(options_global.attr)) + 
+                            '>More..</a>').insertAfter($($(element).find('a')[insertion_index]));
+
+/*                  Animation is still a WIP.
+ *
+ *                  ).click(function(){
+ *                      //$(element).find('.page-'+current_visible_page++).slideUp();
+ *                      $(element).find('.page-'+$(element).data('current-page')).slideUp();
+ *                      $(element).data()['current-page']++;
+ *                  });
+ */
+                    more_index += options_global.page_limit - 1;
+                    shift_count++;
+                }
+            }
+
+            // Find weights and critical points of elements in div. 
+            weights = $(this).find('a').map(function(index){ 
+                return parseInt($(this).attr(options.attr)); 
+            }).get(); 
+
             // Weight calculations.
             var page_index = 0;
             weights.total = 0;
@@ -56,7 +88,6 @@
 
                 // Once again, time to jump pages.
                 while (index >= options_global.page_limit * (page_index + 1)) { 
-                    // ADD IN 'MORE...' ELEMENT
                     height_remaining = width_remaining = 100;   
                     ++page_index; 
                 }
@@ -78,6 +109,11 @@
                     .css("float", "left")
                     .css("text-align", "center")
                 ;
+
+                if (options_global.more_link){
+                   // $(element).data('page', page_index);
+                   // $(element).addClass('page-'+page_index);
+                }
 
                 // Slice should be horizontal.
                 if (! (index % 2) ) {        
@@ -113,6 +149,7 @@
         size: linear_map,
         unit: "px",
         page_limit: 5,
+        more_link: false,
         colors: [
             "#AF0823",
             "#125FAD",
