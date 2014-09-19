@@ -10,17 +10,22 @@
         this.each(function(index, element){
             $(element).css('overflow','hidden');
             $(element).data('current-page',0);
-            $(element).css('height','200px');
            
             // Custodial business.
             options_global = options = $.extend({}, $.fn.squares.defaults, options);
-            shuffleArray(options_global.colors);
+
+            // Randomize color orders if desired.
+            if (options_global.random_color_order) {
+                shuffleArray(options_global.colors);
+            }
 
             // Calculating percentage left of div; should be better way?
             height_remaining = width_remaining = 100;   
 
             // Set height of primary square container to be some ratio of the parent's width and supplied dimension.
-            $(this).css("height", parseInt($(this).parent().css("width"))/options_global.ratio + "px");
+            // Something's busted here. Remember to fix this.
+            // $(element).css("height", parseInt($(element).parent().css("width"))/options_global.ratio + "px");
+            // $(element).css("height",$(element).parent().css("height"));
 
             // Rearrange elements in div.
             var sorted_elems = $(this).find('a').sort(weight_descending);
@@ -54,7 +59,7 @@
                 }
             }
 
-            // Find weights and critical points of elements in div. 
+            // Find weights of elements in div. 
             weights = $(this).find('a').map(function(index){ 
                 return parseInt($(this).attr(options.attr)); 
             }).get(); 
@@ -90,6 +95,10 @@
                 while (index >= options_global.page_limit * (page_index + 1)) { 
                     height_remaining = width_remaining = 100;   
                     ++page_index; 
+                }
+
+                if (page_index >= options_global.page_count_limit){     // Hack to stop before limit.
+                    return false;
                 }
 
                 // Determine size of sub-square in relation to rest. Percision errors here.
@@ -131,6 +140,23 @@
 
                     width_remaining  = width_remaining - (width_remaining * ratio) || 100; 
                 }
+
+                // TEXT RESIZE HACK: Taken shamelessly from 
+                // http://stackoverflow.com/questions/2652372/how-to-get-anchor-text-href-on-click-using-jquery
+                var width = $(element).width(),
+                    html = '<span style="white-space:nowrap"></span>',
+                    line = $( element ).wrapInner( html ).children()[ 0 ],
+                    n = options_global.max;
+
+                    $( element ).css( 'font-size', n );
+
+                    while ( $( line ).width() > width ) {
+                        $( element ).css( 'font-size', --n );
+                    }
+
+                    $( element ).text( $( line ).text() );
+                // End shameful content. 
+
                 
                 // Center text vertically in sub-square.
                 $(this).css("line-height", $(this).height()+"px");  
@@ -149,7 +175,10 @@
         size: linear_map,
         unit: "px",
         page_limit: 5,
+        page_count_limit: 1,
+        squares_height: 180,
         more_link: false,
+        random_color_order: false,
         colors: [
             "#AF0823",
             "#125FAD",
